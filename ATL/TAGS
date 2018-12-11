@@ -3,7 +3,7 @@
 module Main Main0,1
 main main4,5
 
-./src/Environments.hs,620
+./src/Environments.hs,490
 module Environments Environments0,1
 data V V7,8
 data V = ValV ValV7,8
@@ -23,13 +23,21 @@ type HObj HObj25,26
 type H H29,30
 type REF REF30,31
 type Eval Eval31,32
-type GlobalInfo GlobalInfo34,35
-newE newE36,37
-newHObj newHObj39,40
-newH newH42,43
-extendE extendE45,46
-extendH extendH48,49
-globalEnv globalEnv53,54
+type GlobalInfo GlobalInfo33,34
+
+./src/EnvironmentUtils.hs,303
+module EnvironmentUtils EnvironmentUtils0,1
+newE newE5,6
+singleE singleE8,9
+extendE extendE11,12
+newHObj newHObj14,15
+singleHObj singleHObj17,18
+extendHObj extendHObj20,21
+newH newH23,24
+singleH singleH26,27
+extendH extendH29,30
+updateHAt updateHAt34,35
+globalEnv globalEnv38,39
 
 ./src/ATL.hs,1106
 module ATL ATL0,1
@@ -73,12 +81,12 @@ someFunc someFunc4,5
 
 ./src/NaturalSemantics.hs,164
 module NaturalSemantics NaturalSemantics0,1
-valv valv11,12
-refv refv12,13
-num num13,14
-procEnvtoEnv procEnvtoEnv14,15
-fresh fresh17,18
-eval eval20,21
+valv valv12,13
+refv refv13,14
+num num14,15
+procEnvtoEnv procEnvtoEnv15,16
+fresh fresh18,19
+eval eval21,22
 
 ./test/Spec.hs,15
 main main0,1

@@ -7,6 +7,7 @@ import Control.Monad
 import Data.Either
 import qualified Data.List as List
 import Environments
+import EnvironmentUtils
 import ATL
 
 valv = Right . ValV
@@ -41,7 +42,7 @@ eval (h0, env, Right (CallExpr id args)) = do
   where
     evalArg (hi, eLoc) (farg, ei) = do
       (h, Right vi) <- eval (hi, env, Right ei)
-      pure (h, extendE eLoc (\farg -> vi))
+      pure (h, extendE eLoc (singleE farg vi))
 
 -- (print)
 eval (h, env, Right (PrintExpr e)) = do
@@ -54,13 +55,17 @@ eval (h, env, Right (NewExpr id)) = do
   (_, d0) <- ask
   index   <- lift get
   let ref = fresh index
-  pure (extendH h (\ref -> d0 id), refv ref)
+  pure (extendH h (singleH ref (d0 id)), refv ref)
 
 -- (load)
-eval (h, env, Right (NameExpr (DeRef (ID base) field))) = pure (h, Right (h (ID base) field))
-eval (h, env, Right (NameExpr (DeRef (DeRef name innerid) id))) = do
-  (h', Right (RefV r)) <- eval (h, env, Right $ NameExpr (DeRef name innerid))
-  pure (h', Right (h' r id))
+eval (h, env, Right (NameExpr (DeRef base field))) = do
+  (h', Right (RefV r)) <- eval (h, env, Right $ NameExpr base)
+  pure (h', Right (h' r field))
 
 -- (store)
-eval (h, env, Left (AssignStmt (DeRef base field) lhs)) = undefined
+eval (h, env, Left (AssignStmt (DeRef base field) lhs)) = do
+  (h', Right (RefV r)) <- eval (h, env, Right $ NameExpr base)
+  (h'', Right v) <- eval (h', env, Right lhs)
+  pure (updateHAt h'' r (extendHObj (h'' r) (singleHObj field v)), Left env)
+
+  

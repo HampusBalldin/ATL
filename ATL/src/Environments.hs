@@ -31,27 +31,5 @@ type H         = REF -> HObj
 type REF       = Name
 type Eval      = (H, E, Either Stmt Expr) -> ReaderT GlobalInfo (StateT Int IO) (H, Either E V)
 
-
 type GlobalInfo = (Ep, D0)
-
-newE :: E
-newE = const VBOTTOM
-
-newHObj :: HObj
-newHObj = const VBOTTOM
-
-newH :: H
-newH = const newHObj 
-
-extendE :: E -> E -> E
-extendE eold enew id = let nid = enew id in if nid /= VBOTTOM then nid else eold id
-
-extendH :: H -> H -> H 
-extendH hold hnew ref id = let hobj = hnew ref
-                               nid  = hobj id
-                           in if nid /= VBOTTOM then nid else hold ref id
-
-globalEnv :: (GlobalInfo, Prog) -> GlobalInfo
-globalEnv = undefined
-
 -- type EvalIO = Read
