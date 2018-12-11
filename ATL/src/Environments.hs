@@ -3,13 +3,24 @@ module Environments where
 import Control.Monad.Reader
 import Control.Monad.State
 import Control.Monad.Except
+import Control.Monad.Identity
 import ATL
 
+-- Possible Values
 data V = ValV {val :: Val}
        | RefV {ref :: REF}
        | SubV {sub :: SUB}
        | SecretV {secret :: V} -- Add Secret Value
        | VBOTTOM
+       deriving (Eq, Show)
+
+-- Possible Types
+data T = IntT
+       | NullT 
+       | UnitT 
+       | SecretT T
+       | FunctionTypeT [T] T
+       | NewTypeT [T]
        deriving (Eq, Show)
 
 addV :: V -> V -> V
@@ -37,6 +48,9 @@ type H         = REF -> HObj
 type REF       = Name
 type Eval      = (H, E, Either Stmt Expr) -> ExceptT String (ReaderT GlobalInfo (StateT Int IO)) (H, Either E V)
 
-type GlobalInfo = (D0, Ep)
+-- Gamma Type Environment
+type GT        = Identifier -> T
+type TypeEval  = (GT, Either Stmt Expr) -> ExceptT String (ReaderT GlobalInfo Identity) T
 
--- type EvalIO = Read
+-- Global Information for types and Functions
+type GlobalInfo = (D0, Ep)
