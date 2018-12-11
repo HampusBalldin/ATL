@@ -8,6 +8,8 @@ ret42 = ReturnStmt $ numE 42
 addTo42 = AddExpr (numE 21) (AddExpr (numE 20) (numE 1))
 printId = PrintExpr . nameE
 
+secretNumE = SecretExpr . numE
+
 mkSeq :: [Stmt] -> Stmt
 mkSeq []     = SkipStmt
 mkSeq [s]    = s
@@ -21,7 +23,12 @@ programs = [
   ,program5
   ,program6
   ,program7
+  ,program8
+  ,program9
+  ,program10
+  ,program11
   ]
+  
 program1 = StmtProg $ ReturnStmt $ numE 42  
 program2 = StmtProg $ SeqStmt SkipStmt ret42
 program3 = StmtProg $ SeqStmt SkipStmt (ReturnStmt addTo42)
@@ -46,4 +53,28 @@ program7 = StmtProg $ mkSeq [
    AssignStmt (ID "x") (AddExpr (nameE "x") (printId "x"))
    ]
   ,ReturnStmt $ AddExpr (nameE "x") (nameE "x")
-           ]
+           ]           
+
+program8 = StmtProg $ mkSeq [
+    ReturnStmt $ PrintExpr $ SecretExpr $ numE 11001010
+            ]
+
+program9 = StmtProg $ mkSeq [
+   AssignStmt (ID "s") (secretNumE 11001010)
+  -- ,AssignStmt (ID "s") (PrintExpr (nameE "s"))
+  ,ReturnStmt $ PrintExpr (nameE "s")
+            ]
+           
+program10 = StmtProg $ mkSeq [
+    AssignStmt (ID "s") (secretNumE 11001010)
+   ,AssignStmt (ID "x") (numE 42)
+  -- ,AssignStmt (ID "s") (PrintExpr (nameE "s"))
+  ,ReturnStmt $ PrintExpr (AddExpr (nameE "s") (nameE "x"))
+            ]
+
+program11 = StmtProg $ mkSeq [
+    AssignStmt (ID "s") (secretNumE 11001010)
+   ,AssignStmt (ID "x") (nameE "s") 
+  -- ,AssignStmt (ID "s") (PrintExpr (nameE "s"))
+  ,ReturnStmt $ PrintExpr (nameE "x")
+            ]

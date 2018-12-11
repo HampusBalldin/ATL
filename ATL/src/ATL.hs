@@ -17,6 +17,7 @@ data Expr = ValExpr Val
           | PrintExpr Expr
           | NewExpr Identifier
           | CallExpr Identifier [Expr]
+          | SecretExpr Expr
           deriving (Eq, Show)
 
 data Type = IntType

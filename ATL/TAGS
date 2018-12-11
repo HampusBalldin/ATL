@@ -3,27 +3,31 @@
 module Main Main0,1
 main main6,7
 
-./src/Environments.hs,490
+./src/Environments.hs,627
 module Environments Environments0,1
-data V V7,8
-data V = ValV ValV7,8
-data V = ValV {val val7,8
-       | RefV RefV8,9
-       | RefV {ref ref8,9
-       | SubV SubV9,10
-       | SubV {sub sub9,10
-       | VBOTTOMVBOTTOM10,11
-data SUB SUB14,15
-data SUB = SUB SUB14,15
-         | SUBBOTTOMSUBBOTTOM15,16
-type E E18,19
-type Ep Ep21,22
-type D0 D022,23
-type HObj HObj25,26
-type H H29,30
-type REF REF30,31
-type Eval Eval31,32
-type GlobalInfo GlobalInfo33,34
+data V V10,11
+data V = ValV ValV10,11
+data V = ValV {val val10,11
+       | RefV RefV11,12
+       | RefV {ref ref11,12
+       | SubV SubV12,13
+       | SubV {sub sub12,13
+       | SecretV SecretV13,14
+       | SecretV {secret secret13,14
+       | VBOTTOMVBOTTOM14,15
+addV addV17,18
+data SUB SUB23,24
+data SUB = SUB SUB23,24
+         | SUBBOTTOMSUBBOTTOM24,25
+type E E27,28
+type Ep Ep30,31
+type D0 D031,32
+type HObj HObj34,35
+type H H38,39
+type REF REF39,40
+type Eval Eval40,41
+type GlobalInfo GlobalInfo42,43
+evalGlobalInfo evalGlobalInfo45,46
 
 ./src/EnvironmentUtils.hs,376
 module EnvironmentUtils EnvironmentUtils0,1
@@ -42,24 +46,29 @@ newEp newEp41,42
 newD0 newD044,45
 newGlobalInfo newGlobalInfo47,48
 
-./src/Programs.hs,340
+./src/Programs.hs,473
 module Programs Programs0,1
 numE numE4,5
 nameE nameE5,6
 ret42 ret426,7
 addTo42 addTo427,8
 printId printId8,9
-mkSeq mkSeq10,11
-programs programs15,16
-program1 program124,25
-program2 program225,26
-program3 program326,27
-program4 program427,28
-program5 program531,32
-program6 program635,36
-program7 program741,42
+secretNumE secretNumE10,11
+mkSeq mkSeq12,13
+programs programs17,18
+program1 program131,32
+program2 program232,33
+program3 program333,34
+program4 program434,35
+program5 program538,39
+program6 program642,43
+program7 program748,49
+program8 program857,58
+program9 program961,62
+program10 program1067,68
+program11 program1174,75
 
-./src/ATL.hs,1106
+./src/ATL.hs,1147
 module ATL ATL0,1
 type Identifier Identifier2,3
 type TypeBinding TypeBinding3,4
@@ -77,23 +86,24 @@ data Expr = ValExpr ValExpr13,14
           | PrintExpr PrintExpr16,17
           | NewExpr NewExpr17,18
           | CallExpr CallExpr18,19
-data Type Type21,22
-data Type = IntTypeIntType21,22
-          | IdType IdType22,23
-data Stmt Stmt25,26
-data Stmt = AssignStmt AssignStmt25,26
-          | BlockStmt BlockStmt26,27
-          | IfThenElseStmt IfThenElseStmt27,28
-          | WhileStmt WhileStmt28,29
-          | SkipStmtSkipStmt29,30
-          | ReturnStmt ReturnStmt30,31
-          | SeqStmt SeqStmt31,32
-data Decl Decl34,35
-data Decl = ProcDecl ProcDecl34,35
-          | NewTypeDecl NewTypeDecl35,36
-data Prog Prog38,39
-data Prog = DeclProg DeclProg38,39
-          | StmtProg StmtProg39,40
+          | SecretExpr SecretExpr19,20
+data Type Type22,23
+data Type = IntTypeIntType22,23
+          | IdType IdType23,24
+data Stmt Stmt26,27
+data Stmt = AssignStmt AssignStmt26,27
+          | BlockStmt BlockStmt27,28
+          | IfThenElseStmt IfThenElseStmt28,29
+          | WhileStmt WhileStmt29,30
+          | SkipStmtSkipStmt30,31
+          | ReturnStmt ReturnStmt31,32
+          | SeqStmt SeqStmt32,33
+data Decl Decl35,36
+data Decl = ProcDecl ProcDecl35,36
+          | NewTypeDecl NewTypeDecl36,37
+data Prog Prog39,40
+data Prog = DeclProg DeclProg39,40
+          | StmtProg StmtProg40,41
 
 ./src/Lib.hs,42
 module LibLib0,1
@@ -101,15 +111,15 @@ someFunc someFunc4,5
 
 ./src/NaturalSemantics.hs,229
 module NaturalSemantics NaturalSemantics0,1
-valv valv12,13
-refv refv13,14
-num num14,15
-zeronum zeronum15,16
-procEnvtoEnv procEnvtoEnv16,17
-isNum isNum19,20
-fresh fresh23,24
-runEval runEval26,27
-eval eval31,32
+valv valv13,14
+refv refv14,15
+num num15,16
+zeronum zeronum16,17
+procEnvtoEnv procEnvtoEnv17,18
+isNum isNum20,21
+fresh fresh24,25
+runEval runEval27,28
+eval eval35,36
 
 ./test/Spec.hs,15
 main main0,1

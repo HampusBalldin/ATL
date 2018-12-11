@@ -2,6 +2,7 @@ module NaturalSemantics where
 
 import Control.Monad.Reader
 import Control.Monad.State
+import Control.Monad.Except
 import Control.Monad
 
 import Data.Either
@@ -24,10 +25,13 @@ isNum _                 = False
 fresh :: Int -> REF
 fresh index = ID ("REF_" ++ show index)
 
-runEval :: Prog -> IO V
+runEval :: Prog -> IO (Either String V)
 runEval (StmtProg s) = do
-  (h, Right v) <- evalStateT (runReaderT (eval (newH, newE, Left s)) newGlobalInfo) 0
-  pure v
+  res <- evalStateT (runReaderT (runExceptT (eval (newH, newE, Left s))) newGlobalInfo) 0
+  case res of
+    Left err -> return $ Left err
+    Right (_, Right v) -> return $ Right v
+    _                  -> return $ Left $ "Got Env back"
 
 eval :: Eval
 
@@ -39,9 +43,9 @@ eval (h, env, Right (NameExpr (ID id))) = pure (h, Right (env id))
 
 -- (plus)
 eval (h, env, Right (AddExpr e1 e2)) = do
-  (h', Right (ValV (Number n1)))  <- eval (h, env, Right e1)
-  (h'', Right (ValV (Number n2))) <- eval (h', env, Right e2)
-  pure (h'', num (n1 + n2))
+  (h', Right v1)  <- eval (h, env, Right e1)
+  (h'', Right v2) <- eval (h', env, Right e2)
+  pure (h'', Right (addV v1 v2))
   
 -- (call)
 eval (h0, env, Right (CallExpr id args)) = do
@@ -56,9 +60,12 @@ eval (h0, env, Right (CallExpr id args)) = do
 
 -- (print)
 eval (h, env, Right (PrintExpr e)) = do
-  (h', Right n) <- eval (h, env, Right e)
-  liftIO $ putStrLn ("PRINT: " ++ show n)
-  pure (h', zeronum)
+  (h', Right v) <- eval (h, env, Right e)
+  case v of
+    SecretV v' -> throwError "Attempt to Print a Secret"
+    _          -> do
+                   liftIO $ putStrLn ("PRINT: " ++ show v)
+                   pure (h', zeronum)
 
 -- (new)
 eval (h, env, Right (NewExpr id)) = do
@@ -110,3 +117,7 @@ eval (h, env, Left (ReturnStmt e)) = do
   (h', Right v) <- eval (h, env, Right e)
   pure (h', Right v)
 
+-- (secret)
+eval (h, env, Right (SecretExpr e)) = do
+  (h', Right v) <- eval (h, env, Right e)
+  pure (h', Right (SecretV v))
