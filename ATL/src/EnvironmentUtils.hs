@@ -35,15 +35,27 @@ extendH hold hnew ref id = let hobj = hnew ref
 updateHAt :: H -> REF -> HObj -> H
 updateHAt hold ref hobj ref' id = if ref == ref' then hobj id else hold ref' id
 
-
 globalEnv :: (GlobalInfo, Prog) -> GlobalInfo
 globalEnv = undefined
 
 newEp :: Ep
 newEp = const SUBBOTTOM
 
+singleEp :: Identifier -> SUB -> Ep
+singleEp id sub id' = if id == id' then sub else SUBBOTTOM
+
+extendEp :: Ep -> Ep -> Ep
+extendEp epold epnew id = let sub = epnew id in if sub /= SUBBOTTOM then sub else epold id
+
 newD0 :: D0
 newD0 = const . const $ VBOTTOM
 
+singleD0 :: Identifier -> E -> D0
+singleD0 id d0e id1 id2 = if id == id1 then d0e id2 else ValV NULL
+
 newGlobalInfo :: GlobalInfo
-newGlobalInfo = (newEp, newD0)
+newGlobalInfo = (newD0, newEp)
+
+mapN :: Type -> V
+mapN IntType = ValV $ Number 0
+mapN  _      = ValV NULL

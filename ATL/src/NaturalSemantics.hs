@@ -10,6 +10,7 @@ import qualified Data.List as List
 import Environments
 import EnvironmentUtils
 import ATL
+import Debug.Trace
 
 valv = Right . ValV
 refv = Right . RefV 
@@ -18,6 +19,9 @@ zeronum = num 0
 procEnvtoEnv :: Ep -> E
 procEnvtoEnv ep id = SubV (ep id)
 
+eProc :: GlobalInfo -> Ep
+eProc (_, ep) = ep
+
 isNum :: V -> Bool
 isNum (ValV (Number _)) = True
 isNum _                 = False
@@ -25,13 +29,27 @@ isNum _                 = False
 fresh :: Int -> REF
 fresh index = ID ("REF_" ++ show index)
 
-runEval :: Prog -> IO (Either String V)
-runEval (StmtProg s) = do
-  res <- evalStateT (runReaderT (runExceptT (eval (newH, newE, Left s))) newGlobalInfo) 0
+runEvalHelper :: GlobalInfo -> Prog -> IO (Either String V)
+runEvalHelper gi (DeclProg d p) = do
+  let gi' = evalGlobalInfo (DeclProg d p) gi
+  runEvalHelper gi' p
+  
+runEvalHelper gi (StmtProg s) = do
+  res <- evalStateT (runReaderT (runExceptT (eval (newH, procEnvtoEnv (eProc gi), Left s))) gi) 0
   case res of
     Left err -> return $ Left err
     Right (_, Right v) -> return $ Right v
     _                  -> return $ Left $ "Got Env back"
+
+runEval :: Prog -> IO (Either String V)
+runEval = runEvalHelper newGlobalInfo
+
+evalGlobalInfo :: Prog -> GlobalInfo -> GlobalInfo
+evalGlobalInfo (StmtProg _) gi = gi
+evalGlobalInfo (DeclProg (ProcDecl id tb s) p) (d0, ep) = (d0', ep'')
+    where
+      (d0', ep') = evalGlobalInfo p (d0, ep)
+      ep''       = extendEp  ep' (singleEp id (SUB s (fst <$> tb)))
 
 eval :: Eval
 
@@ -49,9 +67,14 @@ eval (h, env, Right (AddExpr e1 e2)) = do
   
 -- (call)
 eval (h0, env, Right (CallExpr id args)) = do
+  liftIO $ putStrLn "A"
   let SubV (SUB s fargs) = env id
+  liftIO $ putStrLn "B1"
+  liftIO $ putStrLn $ show args
+  liftIO $ putStrLn "B2"
   (hk, eLoc) <- foldM evalArg (h0, newE) (zip fargs args)
-  (ep, _) <- ask
+  liftIO $ putStrLn "C"
+  (_, ep) <- ask
   eval (hk, extendE (procEnvtoEnv ep) eLoc, Left s)
   where
     evalArg (hi, eLoc) (farg, ei) = do
@@ -69,7 +92,7 @@ eval (h, env, Right (PrintExpr e)) = do
 
 -- (new)
 eval (h, env, Right (NewExpr id)) = do
-  (_, d0) <- ask
+  (d0, _) <- ask
   index   <- lift get
   let ref = fresh index
   pure (extendH h (singleH ref (d0 id)), refv ref)

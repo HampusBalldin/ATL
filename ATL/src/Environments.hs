@@ -3,9 +3,6 @@ module Environments where
 import Control.Monad.Reader
 import Control.Monad.State
 import Control.Monad.Except
-
-
-
 import ATL
 
 data V = ValV {val :: Val}
@@ -40,8 +37,6 @@ type H         = REF -> HObj
 type REF       = Name
 type Eval      = (H, E, Either Stmt Expr) -> ExceptT String (ReaderT GlobalInfo (StateT Int IO)) (H, Either E V)
 
-type GlobalInfo = (Ep, D0)
--- type EvalIO = Read
+type GlobalInfo = (D0, Ep)
 
-evalGlobalInfo :: Prog -> GlobalInfo -> GlobalInfo
-evalGlobalInfo = undefined
+-- type EvalIO = Read

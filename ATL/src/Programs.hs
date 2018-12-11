@@ -27,6 +27,7 @@ programs = [
   ,program9
   ,program10
   ,program11
+  ,program12
   ]
   
 program1 = StmtProg $ ReturnStmt $ numE 42  
@@ -78,3 +79,10 @@ program11 = StmtProg $ mkSeq [
   -- ,AssignStmt (ID "s") (PrintExpr (nameE "s"))
   ,ReturnStmt $ PrintExpr (nameE "x")
             ]
+
+program12     = DeclProg (ProcDecl "func" [("x", IntType), ("y", IntType)] (mkSeq [
+  ReturnStmt $ AddExpr (nameE "x") (nameE "y")
+               ])) program12main
+program12main = StmtProg $ mkSeq [
+  AssignStmt (ID "r") (CallExpr "func" (numE <$> [2, 3]))
+  ,ReturnStmt $ PrintExpr (nameE "r")
