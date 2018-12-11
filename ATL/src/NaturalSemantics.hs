@@ -31,7 +31,7 @@ fresh index = ID ("REF_" ++ show index)
 
 runEvalHelper :: GlobalInfo -> Prog -> IO (Either String V)
 runEvalHelper gi (DeclProg d p) = do
-  let gi' = evalGlobalInfo (DeclProg d p) gi
+  let gi' = evalGlobalInfo d gi
   runEvalHelper gi' p
   
 runEvalHelper gi (StmtProg s) = do
@@ -44,12 +44,14 @@ runEvalHelper gi (StmtProg s) = do
 runEval :: Prog -> IO (Either String V)
 runEval = runEvalHelper newGlobalInfo
 
-evalGlobalInfo :: Prog -> GlobalInfo -> GlobalInfo
-evalGlobalInfo (StmtProg _) gi = gi
-evalGlobalInfo (DeclProg (ProcDecl id tb s) p) (d0, ep) = (d0', ep'')
+evalGlobalInfo :: Decl -> GlobalInfo -> GlobalInfo
+evalGlobalInfo (ProcDecl id tb s) (d0, ep) = (d0, ep')
     where
-      (d0', ep') = evalGlobalInfo p (d0, ep)
-      ep''       = extendEp  ep' (singleEp id (SUB s (fst <$> tb)))
+        ep' = extendEp ep (singleEp id (SUB s (fst <$> tb)))
+        
+evalGlobalInfo (NewTypeDecl id tb) (d0, ep) = (extendD0 d0 d0', ep)
+    where
+        d0' = List.foldl' (\dacc (idi, tyi) -> extendD0 dacc (singleD0 id (singleE idi (mapN tyi)))) newD0 tb
 
 eval :: Eval
 
@@ -67,13 +69,8 @@ eval (h, env, Right (AddExpr e1 e2)) = do
   
 -- (call)
 eval (h0, env, Right (CallExpr id args)) = do
-  liftIO $ putStrLn "A"
   let SubV (SUB s fargs) = env id
-  liftIO $ putStrLn "B1"
-  liftIO $ putStrLn $ show args
-  liftIO $ putStrLn "B2"
   (hk, eLoc) <- foldM evalArg (h0, newE) (zip fargs args)
-  liftIO $ putStrLn "C"
   (_, ep) <- ask
   eval (hk, extendE (procEnvtoEnv ep) eLoc, Left s)
   where
@@ -87,8 +84,8 @@ eval (h, env, Right (PrintExpr e)) = do
   case v of
     SecretV v' -> throwError "Attempt to Print a Secret"
     _          -> do
-                   liftIO $ putStrLn ("PRINT: " ++ show v)
-                   pure (h', zeronum)
+                    liftIO $ putStrLn ("PRINT: " ++ show v)
+                    pure (h', zeronum)
 
 -- (new)
 eval (h, env, Right (NewExpr id)) = do

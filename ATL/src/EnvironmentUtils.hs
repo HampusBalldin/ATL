@@ -53,6 +53,9 @@ newD0 = const . const $ VBOTTOM
 singleD0 :: Identifier -> E -> D0
 singleD0 id d0e id1 id2 = if id == id1 then d0e id2 else ValV NULL
 
+extendD0 :: D0 -> D0 -> D0
+extendD0 d0old d0new id1 id2 = let d = d0new id1 id2 in if d /= VBOTTOM then d else d0old id1 id2 
+
 newGlobalInfo :: GlobalInfo
 newGlobalInfo = (newD0, newEp)
 

@@ -28,6 +28,9 @@ programs = [
   ,program10
   ,program11
   ,program12
+  ,program13
+  ,program14
+  ,program15
   ]
   
 program1 = StmtProg $ ReturnStmt $ numE 42  
@@ -86,3 +89,25 @@ program12     = DeclProg (ProcDecl "func" [("x", IntType), ("y", IntType)] (mkSe
 program12main = StmtProg $ mkSeq [
   AssignStmt (ID "r") (CallExpr "func" (numE <$> [2, 3]))
   ,ReturnStmt $ PrintExpr (nameE "r")
+    ]
+
+program13 = DeclProg (NewTypeDecl "Person" [("age", IntType)]) program13main
+program13main = StmtProg $ mkSeq [
+   AssignStmt (ID "x") (NewExpr "Person")
+  ,ReturnStmt (NameExpr (DeRef (ID "x") "age"))
+                                 ]
+
+program14 = DeclProg (NewTypeDecl "Person" [("age", IntType)]) program14main
+program14main = StmtProg $ mkSeq [
+   AssignStmt (ID "x") (NewExpr "Person")
+  ,AssignStmt (DeRef (ID "x") "age") (numE 42)
+  ,ReturnStmt (NameExpr (DeRef (ID "x") "age"))
+                                 ]
+
+program15 = DeclProg (NewTypeDecl "Person" [("age", IntType)]) program15main
+program15main = StmtProg $ mkSeq [
+   AssignStmt (ID "x") (NewExpr "Person")
+  ,AssignStmt (DeRef (ID "x") "age") (secretNumE 42)
+  ,AssignStmt (ID "y") (NameExpr (DeRef (ID "x") "age"))
+  ,ReturnStmt (PrintExpr (nameE "y"))
+                                 ]

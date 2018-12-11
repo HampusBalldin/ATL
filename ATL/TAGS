@@ -28,7 +28,7 @@ type REF REF36,37
 type Eval Eval37,38
 type GlobalInfo GlobalInfo39,40
 
-./src/EnvironmentUtils.hs,468
+./src/EnvironmentUtils.hs,493
 module EnvironmentUtils EnvironmentUtils0,1
 newE newE5,6
 singleE singleE8,9
@@ -46,10 +46,11 @@ singleEp singleEp43,44
 extendEp extendEp46,47
 newD0 newD049,50
 singleD0 singleD052,53
-newGlobalInfo newGlobalInfo55,56
-mapN mapN58,59
+extendD0 extendD055,56
+newGlobalInfo newGlobalInfo58,59
+mapN mapN61,62
 
-./src/Programs.hs,535
+./src/Programs.hs,728
 module Programs Programs0,1
 numE numE4,5
 nameE nameE5,6
@@ -59,19 +60,25 @@ printId printId8,9
 secretNumE secretNumE10,11
 mkSeq mkSeq12,13
 programs programs17,18
-program1 program132,33
-program2 program233,34
-program3 program334,35
-program4 program435,36
-program5 program539,40
-program6 program643,44
-program7 program749,50
-program8 program858,59
-program9 program962,63
-program10 program1068,69
-program11 program1175,76
-program12 program1282,83
-program12main program12main85,86
+program1 program135,36
+program2 program236,37
+program3 program337,38
+program4 program438,39
+program5 program542,43
+program6 program646,47
+program7 program752,53
+program8 program861,62
+program9 program965,66
+program10 program1071,72
+program11 program1178,79
+program12 program1285,86
+program12main program12main88,89
+program13 program1393,94
+program13main program13main94,95
+program14 program1499,100
+program14main program14main100,101
+program15 program15106,107
+program15main program15main107,108
 
 ./src/ATL.hs,1147
 module ATL ATL0,1
@@ -127,7 +134,7 @@ fresh fresh28,29
 runEvalHelper runEvalHelper31,32
 runEval runEval43,44
 evalGlobalInfo evalGlobalInfo46,47
-eval eval53,54
+eval eval55,56
 
 ./test/Spec.hs,15
 main main0,1
