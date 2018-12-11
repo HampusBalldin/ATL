@@ -1,7 +1,7 @@
 
 ./app/Main.hs,37
 module Main Main0,1
-main main4,5
+main main6,7
 
 ./src/Environments.hs,490
 module Environments Environments0,1
@@ -25,7 +25,7 @@ type REF REF30,31
 type Eval Eval31,32
 type GlobalInfo GlobalInfo33,34
 
-./src/EnvironmentUtils.hs,303
+./src/EnvironmentUtils.hs,376
 module EnvironmentUtils EnvironmentUtils0,1
 newE newE5,6
 singleE singleE8,9
@@ -38,6 +38,26 @@ singleH singleH26,27
 extendH extendH29,30
 updateHAt updateHAt34,35
 globalEnv globalEnv38,39
+newEp newEp41,42
+newD0 newD044,45
+newGlobalInfo newGlobalInfo47,48
+
+./src/Programs.hs,340
+module Programs Programs0,1
+numE numE4,5
+nameE nameE5,6
+ret42 ret426,7
+addTo42 addTo427,8
+printId printId8,9
+mkSeq mkSeq10,11
+programs programs15,16
+program1 program124,25
+program2 program225,26
+program3 program326,27
+program4 program427,28
+program5 program531,32
+program6 program635,36
+program7 program741,42
 
 ./src/ATL.hs,1106
 module ATL ATL0,1
@@ -79,14 +99,17 @@ data Prog = DeclProg DeclProg38,39
 module LibLib0,1
 someFunc someFunc4,5
 
-./src/NaturalSemantics.hs,164
+./src/NaturalSemantics.hs,229
 module NaturalSemantics NaturalSemantics0,1
 valv valv12,13
 refv refv13,14
 num num14,15
-procEnvtoEnv procEnvtoEnv15,16
-fresh fresh18,19
-eval eval21,22
+zeronum zeronum15,16
+procEnvtoEnv procEnvtoEnv16,17
+isNum isNum19,20
+fresh fresh23,24
+runEval runEval26,27
+eval eval31,32
 
 ./test/Spec.hs,15
 main main0,1

@@ -38,3 +38,12 @@ updateHAt hold ref hobj ref' id = if ref == ref' then hobj id else hold ref' id
 
 globalEnv :: (GlobalInfo, Prog) -> GlobalInfo
 globalEnv = undefined
+
+newEp :: Ep
+newEp = const SUBBOTTOM
+
+newD0 :: D0
+newD0 = const . const $ VBOTTOM
+
+newGlobalInfo :: GlobalInfo
+newGlobalInfo = (newEp, newD0)

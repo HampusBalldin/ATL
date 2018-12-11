@@ -109,4 +109,3 @@ eval (h, env, Left (WhileStmt e s)) = eval (h, env, Left (IfThenElseStmt e (SeqS
 eval (h, env, Left (ReturnStmt e)) = do
   (h', Right v) <- eval (h, env, Right e)
   pure (h', Right v)
-

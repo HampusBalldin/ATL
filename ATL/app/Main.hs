@@ -1,6 +1,15 @@
 module Main where
 
-import Lib
+import Control.Monad
+import Programs
+import NaturalSemantics
 
 main :: IO ()
-main = someFunc
+main = do
+  forM_ programs $ \p -> do
+    putStrLn "--------------------------------"
+    putStrLn $ show p
+    putStrLn "--------------------------------"
+    v <- runEval p
+    putStrLn (show v)
+    putStrLn "--------------------------------"
