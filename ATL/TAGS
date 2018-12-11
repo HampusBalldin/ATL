@@ -1,0 +1,87 @@
+
+./app/Main.hs,37
+module Main Main0,1
+main main4,5
+
+./src/Environments.hs,620
+module Environments Environments0,1
+data V V7,8
+data V = ValV ValV7,8
+data V = ValV {val val7,8
+       | RefV RefV8,9
+       | RefV {ref ref8,9
+       | SubV SubV9,10
+       | SubV {sub sub9,10
+       | VBOTTOMVBOTTOM10,11
+data SUB SUB14,15
+data SUB = SUB SUB14,15
+         | SUBBOTTOMSUBBOTTOM15,16
+type E E18,19
+type Ep Ep21,22
+type D0 D022,23
+type HObj HObj25,26
+type H H29,30
+type REF REF30,31
+type Eval Eval31,32
+type GlobalInfo GlobalInfo34,35
+newE newE36,37
+newHObj newHObj39,40
+newH newH42,43
+extendE extendE45,46
+extendH extendH48,49
+globalEnv globalEnv53,54
+
+./src/ATL.hs,1106
+module ATL ATL0,1
+type Identifier Identifier2,3
+type TypeBinding TypeBinding3,4
+data Name Name5,6
+data Name = ID ID5,6
+          | DeRef DeRef6,7
+data Val Val9,10
+data Val = Number Number9,10
+data Val = Number { integer integer9,10
+         | NULLNULL10,11
+data Expr Expr13,14
+data Expr = ValExpr ValExpr13,14
+          | AddExpr AddExpr14,15
+          | NameExpr NameExpr15,16
+          | PrintExpr PrintExpr16,17
+          | NewExpr NewExpr17,18
+          | CallExpr CallExpr18,19
+data Type Type21,22
+data Type = IntTypeIntType21,22
+          | IdType IdType22,23
+data Stmt Stmt25,26
+data Stmt = AssignStmt AssignStmt25,26
+          | BlockStmt BlockStmt26,27
+          | IfThenElseStmt IfThenElseStmt27,28
+          | WhileStmt WhileStmt28,29
+          | SkipStmtSkipStmt29,30
+          | ReturnStmt ReturnStmt30,31
+          | SeqStmt SeqStmt31,32
+data Decl Decl34,35
+data Decl = ProcDecl ProcDecl34,35
+          | NewTypeDecl NewTypeDecl35,36
+data Prog Prog38,39
+data Prog = DeclProg DeclProg38,39
+          | StmtProg StmtProg39,40
+
+./src/Lib.hs,42
+module LibLib0,1
+someFunc someFunc4,5
+
+./src/NaturalSemantics.hs,164
+module NaturalSemantics NaturalSemantics0,1
+valv valv11,12
+refv refv12,13
+num num13,14
+procEnvtoEnv procEnvtoEnv14,15
+fresh fresh17,18
+eval eval20,21
+
+./test/Spec.hs,15
+main main0,1
+
+./Setup.hs,15
+main main1,2
