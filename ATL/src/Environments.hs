@@ -32,6 +32,7 @@ addV v1 (SecretV v2) = SecretV (addV v1 v2)
 data SUB = SUB Stmt [Identifier]
          | SUBBOTTOM
          deriving (Eq, Show)
+
 -- Environment
 type E         = Identifier -> V
 
@@ -49,8 +50,9 @@ type REF       = Name
 type Eval      = (H, E, Either Stmt Expr) -> ExceptT String (ReaderT GlobalInfo (StateT Int IO)) (H, Either E V)
 
 -- Gamma Type Environment
-type GT        = Identifier -> T
-type TypeEval  = (GT, Either Stmt Expr) -> ExceptT String (ReaderT GlobalInfo Identity) T
+type GT          = Identifier -> T
+type TypeEvalRes = ExceptT String (ReaderT (GlobalInfo) (StateT GT Identity)) T
+type TypeEval    = Either Stmt Expr -> TypeEvalRes
 
 -- Global Information for types and Functions
 type GlobalInfo = (D0, Ep)
