@@ -62,3 +62,7 @@ newGlobalInfo = (newD0, newEp)
 mapN :: Type -> V
 mapN IntType = ValV $ Number 0
 mapN  _      = ValV NULL
+
+mapT :: Type -> T
+mapT IntType     = IntT
+mapT (IdType id) = NewTypeT id

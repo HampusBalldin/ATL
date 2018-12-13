@@ -1,7 +1,7 @@
 module ATL where
 
-type Identifier  = String
-type TypeBinding = [(Identifier, Type)]
+type Identifier     = String
+type TypeBinding    = [(Identifier, Type)]
 
 data Name = ID Identifier 
           | DeRef Name Identifier

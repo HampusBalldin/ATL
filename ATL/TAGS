@@ -3,7 +3,7 @@
 module Main Main0,1
 main main6,7
 
-./src/Environments.hs,840
+./src/Environments.hs,1327
 module Environments Environments0,1
 data V V9,10
 data V = ValV ValV9,10
@@ -20,24 +20,38 @@ data T = IntTIntT17,18
        | NullTNullT18,19
        | UnitTUnitT19,20
        | SecretT SecretT20,21
-       | FunctionTypeT FunctionTypeT21,22
-       | NewTypeT NewTypeT22,23
-addV addV25,26
-data SUB SUB31,32
-data SUB = SUB SUB31,32
-         | SUBBOTTOMSUBBOTTOM32,33
-type E E35,36
-type Ep Ep38,39
-type D0 D039,40
-type HObj HObj42,43
-type H H46,47
-type REF REF47,48
-type Eval Eval48,49
-type GT GT51,52
-type TypeEval TypeEval52,53
-type GlobalInfo GlobalInfo55,56
+       | NewTypeT NewTypeT21,22
+       | FuncT FuncT22,23
+       | TBOTTOMTBOTTOM23,24
+       | TypeVar TypeVar24,25
+data Prop Prop27,28
+data Prop = TypeOf TypeOf27,28
+          | Assignable Assignable28,29
+          | GammaConstr GammaConstr29,30
+type Premise Premise32,33
+type Conclusion Conclusion33,34
+data Infer Infer34,35
+data Infer      = Infer Infer34,35
+data Infer      = Infer { premise premise34,35
+data Infer      = Infer { premise ::Premise,  conclusion conclusion34,35
+type IR IR36,37
+addV addV38,39
+data SUB SUB44,45
+data SUB = SUB SUB44,45
+         | SUBBOTTOMSUBBOTTOM45,46
+type E E49,50
+type Ep Ep52,53
+type D0 D053,54
+type HObj HObj56,57
+type H H60,61
+type REF REF61,62
+type Eval Eval62,63
+type GT GT65,66
+type TypeEvalRes TypeEvalRes66,67
+type TypeEval TypeEval67,68
+type GlobalInfo GlobalInfo70,71
 
-./src/EnvironmentUtils.hs,493
+./src/EnvironmentUtils.hs,510
 module EnvironmentUtils EnvironmentUtils0,1
 newE newE5,6
 singleE singleE8,9
@@ -58,6 +72,7 @@ singleD0 singleD052,53
 extendD0 extendD055,56
 newGlobalInfo newGlobalInfo58,59
 mapN mapN61,62
+mapT mapT65,66
 
 ./src/Programs.hs,728
 module Programs Programs0,1
@@ -126,9 +141,14 @@ data Prog Prog39,40
 data Prog = DeclProg DeclProg39,40
           | StmtProg StmtProg40,41
 
-./src/Types.hs,47
+./src/Types.hs,176
 module Types Types0,1
-typeval typeval10,11
+mappendTypes mappendTypes12,13
+infRules infRules18,19
+testEq testEq24,25
+maybeFail maybeFail29,30
+funcID funcID33,34
+typeEval typeEval36,37
 
 ./src/Lib.hs,42
 module LibLib0,1

@@ -19,9 +19,22 @@ data T = IntT
        | NullT 
        | UnitT 
        | SecretT T
-       | FunctionTypeT [T] T
-       | NewTypeT [T]
+       | NewTypeT Identifier
+       | FuncT [T] T
+       | TBOTTOM
+       | TypeVar Identifier
        deriving (Eq, Show)
+
+data Prop = TypeOf Expr T
+          | Assignable Expr T
+          | GammaConstr Identifier T
+          deriving (Eq, Show)
+
+type Premise    = [Prop]
+type Conclusion = Prop
+data Infer      = Infer { premise ::Premise,  conclusion :: Conclusion }
+                deriving (Eq, Show)
+type IR         = Either Stmt Expr -> [Infer]
 
 addV :: V -> V -> V
 addV (ValV (Number n1)) (ValV (Number n2)) = ValV (Number (n1 + n2))
@@ -51,7 +64,7 @@ type Eval      = (H, E, Either Stmt Expr) -> ExceptT String (ReaderT GlobalInfo 
 
 -- Gamma Type Environment
 type GT          = Identifier -> T
-type TypeEvalRes = ExceptT String (ReaderT (GlobalInfo) (StateT GT Identity)) T
+type TypeEvalRes = ExceptT String (ReaderT (IR, GlobalInfo) (StateT GT Identity)) T
 type TypeEval    = Either Stmt Expr -> TypeEvalRes
 
 -- Global Information for types and Functions

@@ -90,7 +90,7 @@ eval (h, env, Right (PrintExpr e)) = do
 -- (new)
 eval (h, env, Right (NewExpr id)) = do
   (d0, _) <- ask
-  index   <- lift get
+  index   <- get
   let ref = fresh index
   pure (extendH h (singleH ref (d0 id)), refv ref)
 
