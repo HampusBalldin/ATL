@@ -1,6 +1,6 @@
 module EnvironmentUtils where
 
-import Data.Map
+import Data.Map (Map, member, (!?), adjust, insert, empty)
 
 import Environments
 import ATL
@@ -87,8 +87,8 @@ singleGT = singleSimple TBOTTOM
 extendGT :: GT -> GT -> GT
 extendGT = extendSimple TBOTTOM
 
-isBound :: GT -> Identifier -> Bool
-isBound gt id = gt id /= TBOTTOM
+bindGT :: GT -> TypeBinding -> GT
+bindGT = foldl (\gt (id, t) -> extendGT gt (singleGT id (mapT t)))
 
 newGlobalInfo :: GlobalInfo
 newGlobalInfo = (newD0, newDT, newEp)

@@ -9,6 +9,7 @@ import Data.Either
 import qualified Data.List as List
 import Environments
 import EnvironmentUtils
+import GlobalInfo
 import ATL
 import Debug.Trace
 
@@ -16,6 +17,7 @@ valv = Right . ValV
 refv = Right . RefV 
 num  = valv . Number
 zeronum = num 0
+
 procEnvtoEnv :: Ep -> E
 procEnvtoEnv ep id = SubV (ep id)
 
@@ -30,10 +32,7 @@ fresh :: Int -> REF
 fresh index = ID ("REF_" ++ show index)
 
 runEvalHelper :: GlobalInfo -> Prog -> IO (Either String V)
-runEvalHelper gi (DeclProg d p) = do
-  let gi' = evalGlobalInfo d gi
-  runEvalHelper gi' p
-  
+runEvalHelper gi (DeclProg d p) = runEvalHelper gi p
 runEvalHelper gi (StmtProg s) = do
   res <- evalStateT (runReaderT (runExceptT (eval (newH, procEnvtoEnv (eProc gi), Left s))) gi) 0
   case res of
@@ -42,18 +41,7 @@ runEvalHelper gi (StmtProg s) = do
     _                  -> return $ Left $ "Got Env back"
 
 runEval :: Prog -> IO (Either String V)
-runEval = runEvalHelper newGlobalInfo
-
-evalGlobalInfo :: Decl -> GlobalInfo -> GlobalInfo
-evalGlobalInfo (ProcDecl id tb s) (d0, dt, ep) = (d0, dt, ep')
-    where
-        ep' = extendEp ep (singleEp id (SUB s (fst <$> tb)))
-        
-evalGlobalInfo (NewTypeDecl id tb) (d0, dt, ep) = (extendD0 d0 d0', dt', ep)
-    where
-        d0' = List.foldl' (\dacc (idi, tyi) -> extendD0 dacc (singleD0 id (singleE idi (mapN tyi)))) newD0 tb
-        -- TypeVar
-        dt' = List.foldl' (\dacc (idi, tyi) -> extendDT dacc (NewTypeT id) idi (mapT tyi)) newDT tb
+runEval p = runEvalHelper (globalInfo p) p
 
 addV :: V -> V -> V
 addV (ValV (Number n1)) (ValV (Number n2)) = ValV (Number (n1 + n2))

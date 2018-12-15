@@ -40,7 +40,7 @@ type Eval Eval48,49
 type GT GT51,52
 type GlobalInfo GlobalInfo54,55
 
-./src/EnvironmentUtils.hs,816
+./src/EnvironmentUtils.hs,814
 module EnvironmentUtils EnvironmentUtils0,1
 type Simple Simple7,8
 type Indirect Indirect8,9
@@ -69,10 +69,18 @@ extendDT extendDT73,74
 newGT newGT80,81
 singleGT singleGT83,84
 extendGT extendGT86,87
-isBound isBound89,90
+bindGT bindGT89,90
 newGlobalInfo newGlobalInfo92,93
 mapN mapN95,96
 mapT mapT99,100
+
+./src/GlobalInfo.hs,137
+module GlobalInfo GlobalInfo0,1
+evalGlobalInfo evalGlobalInfo8,9
+globalInfo globalInfo19,20
+d0 d023,24
+dt dt26,27
+ep ep29,30
 
 ./src/Programs.hs,757
 module Programs Programs0,1
@@ -142,43 +150,44 @@ data Prog Prog39,40
 data Prog = DeclProg DeclProg39,40
           | StmtProg StmtProg40,41
 
-./src/Types.hs,492
+./src/Types.hs,543
 module Types Types0,1
-mappendTypes mappendTypes15,16
-data Inferrable Inferrable20,21
-data Inferrable = E E20,21
-                | S S21,22
-                | P P22,23
-data InferType InferType25,26
-data InferType = TypeOf TypeOf25,26
-               | Assignable Assignable26,27
-type Inference Inference29,30
-localState localState31,32
-typeUniverse typeUniverse40,41
-evalInfer evalInfer43,44
-runInferWith runInferWith46,47
-proveAND proveAND49,50
-infer infer57,58
+mappendTypes mappendTypes16,17
+printLine printLine21,22
+data Inferrable Inferrable23,24
+data Inferrable = E E23,24
+                | S S24,25
+                | P P25,26
+data InferType InferType28,29
+data InferType = TypeOf TypeOf28,29
+               | Assignable Assignable29,30
+type InferenceRes InferenceRes32,33
+type Inference Inference33,34
+typeCheck typeCheck35,36
+localState localState41,42
+typeUniverse typeUniverse44,45
+when2 when247,48
+proveAND proveAND50,51
+infer infer58,59
 
 ./src/Lib.hs,42
 module LibLib0,1
 someFunc someFunc4,5
 
-./src/NaturalSemantics.hs,337
+./src/NaturalSemantics.hs,300
 module NaturalSemantics NaturalSemantics0,1
-valv valv14,15
-refv refv15,16
-num num16,17
-zeronum zeronum17,18
-procEnvtoEnv procEnvtoEnv18,19
-eProc eProc21,22
-isNum isNum24,25
-fresh fresh28,29
-runEvalHelper runEvalHelper31,32
-runEval runEval43,44
-evalGlobalInfo evalGlobalInfo46,47
-addV addV57,58
-eval eval62,63
+valv valv15,16
+refv refv16,17
+num num17,18
+zeronum zeronum18,19
+procEnvtoEnv procEnvtoEnv20,21
+eProc eProc23,24
+isNum isNum26,27
+fresh fresh30,31
+runEvalHelper runEvalHelper33,34
+runEval runEval42,43
+addV addV45,46
+eval eval50,51
 
 ./test/Spec.hs,15
 main main0,1
