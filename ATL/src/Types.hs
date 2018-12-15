@@ -6,6 +6,9 @@ import Control.Monad.Identity
 import Control.Monad.State
 import Control.Monad
 
+import qualified Data.Map as M
+import Data.Map (Map)
+
 import ATL
 import Environments
 import EnvironmentUtils
@@ -15,57 +18,90 @@ mappendTypes (SecretT t1) t2 = SecretT <$> mappendTypes t1 t2
 mappendTypes t1 (SecretT t2) = SecretT <$> mappendTypes t1 t2
 mappendTypes t1 t2           = if t1 == t2 then Just t1 else Nothing
 
+data Inferrable = E Expr
+                | S Stmt
+                | P Prog
+                deriving (Eq, Show)
 
-infRules :: IR
-infRules (Right e@(ValExpr (Number n))) = pure $ Infer [] (TypeOf e IntT)
-infRules (Right e@(ValExpr NULL))       = pure $ Infer [] (TypeOf e NullT)
-infRules (Right e@(NameExpr (ID id)))   = pure $ Infer [GammaConstr id (TypeVar "t")] (TypeOf e (TypeVar "t"))
+data InferType = TypeOf Inferrable T
+               | Assignable Inferrable T
+               deriving (Eq, Show)
 
+type Inference = InferType -> StateT GT Identity Bool
 
-testEq :: String -> T -> T -> TypeEvalRes
-testEq err t1 t2 
-    | t1 == t2  = pure t1
-    | otherwise = throwError err
+localState :: Monad m => (s -> s) -> StateT s m a -> StateT s m a
+localState f st = do
+  s <- get
+  a <- withStateT f st
+  put s
+  pure a
 
-maybeFail :: String -> Maybe T -> TypeEvalRes
-maybeFail err Nothing = throwError err
-maybeFail _ (Just t)  = pure t
+  
 
-funcID :: Identifier -> Identifier
-funcID = ("F_" ++)
+typeUniverse :: [T]
+typeUniverse = [NullT, IntT]
 
-typeEval :: TypeEval
+evalInfer :: InferType -> Bool
+evalInfer inf = runIdentity (evalStateT (infer inf) newGT)
+
+runInferWith :: GT -> InferType -> (Bool, GT)
+runInferWith gt inf = runIdentity (runStateT (infer inf) gt)
+
+proveAND :: [InferType] -> StateT GT Identity Bool
+proveAND infs = do
+  gt <- get 
+  r <- foldM single True infs
+  if r then pure r else const False <$> put gt
+  where
+    single r it = if r then infer it else pure r
+
+infer :: Inference
 -- (t-num)
-typeEval (Right (ValExpr (Number n))) = pure IntT
+infer (TypeOf (E (ValExpr (Number n))) IntT) = pure True
 
 -- (t-null)
-typeEval (Right (ValExpr NULL)) = pure NullT
+infer (TypeOf (E (ValExpr NULL)) NullT)      = pure True
 
 -- (t-id)
-typeEval (Right (NameExpr (ID id))) = do
+infer (TypeOf (E (NameExpr (ID id))) t) = do
   gt <- get
-  let res = gt id
-  if res == TBOTTOM then throwError ("No type for: " ++ id)
-  else pure res
+  case gt id of
+    TBOTTOM -> const True <$> put (extendGT gt (singleGT id t))
+    t'      -> pure (t == t')
 
 -- (t-call)
-typeEval (Right (CallExpr id es)) = do
+infer (TypeOf (E (CallExpr id args)) t0) = do
   gt <- get
-  case gt (funcID id) of
-    FuncT at rt -> do
-      tes <- sequence (typeEval . Right <$> es)
-      let eqs = zip at tes
-      if and ((uncurry (==)) <$> eqs) then pure rt else throwError ("Mismatching types at: " ++ show (CallExpr id es))
-      
-    _ -> throwError ("No func binding for: " ++ (funcID id))
+  case gt id of
+    FuncT targs rt -> if rt == t0 then proveAND $ [TypeOf (E a) t | (a, t) <- zip args targs] else pure False
+    _              -> pure False
 
 -- (t-plus)
-typeEval (Right (AddExpr e1 e2)) = do
-   t1 <- typeEval (Right e1)
-   t2 <- typeEval (Right e2)
-   maybeFail ("Mismatch for types: " ++ show t1 ++ ", " ++ show t2 ++ " at " ++ show (AddExpr e1 e2)) (mappendTypes t1 t2)
+infer (TypeOf (E (AddExpr e1 e2)) IntT) = proveAND [TypeOf (E e1) IntT, TypeOf (E e2) IntT]
 
--- (t-print)
-typeEval (Right (PrintExpr e)) = do
-    t <- typeEval (Right e)
-    testEq ("Expected type INT at: " ++ show (PrintExpr e) ++ ", but got " ++ show t) t IntT
+-- (t-assign)
+infer (TypeOf (S (AssignStmt (ID id) e)) UnitT) = foldM single False typeUniverse 
+    where
+      single r t = if not r then proveAND (prog t) else pure True
+      prog t = [TypeOf (E $ NameExpr $ ID id) t, Assignable (E e) t]
+
+-- (t-seq)
+infer (TypeOf (S (SeqStmt s1 s2)) t) = proveAND [TypeOf (S s1) UnitT, TypeOf (S s2) t]
+
+-- (t-stmtprog)
+infer (TypeOf (P (StmtProg s)) UnitT) = infer (TypeOf (S s) UnitT)
+
+-- (t-proc)
+-- infer (TypeOf (P (DeclProg (ProcDecl id tb s) p)) t) = do
+--   infer (TypeOf (P p) t)
+--   infer (TypeOf (E (NameExpr (ID id))) (FuncT (mapT . snd <$> tb) t0))
+--   localState (\gt -> gt) (infer (TypeOf (S s) t))
+
+-- (assignable-ty)
+infer (Assignable (E e) t) = infer (TypeOf (E e) t)
+
+-- (t-fail)
+infer _ = pure False
+
+  
+  

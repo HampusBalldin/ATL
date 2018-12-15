@@ -3,78 +3,78 @@
 module Main Main0,1
 main main6,7
 
-./src/Environments.hs,1327
+./src/TypePrograms.hs,38
+module TypePrograms TypePrograms0,1
+
+./src/Environments.hs,829
 module Environments Environments0,1
-data V V9,10
-data V = ValV ValV9,10
-data V = ValV {val val9,10
-       | RefV RefV10,11
-       | RefV {ref ref10,11
-       | SubV SubV11,12
-       | SubV {sub sub11,12
-       | SecretV SecretV12,13
-       | SecretV {secret secret12,13
-       | VBOTTOMVBOTTOM13,14
-data T T17,18
-data T = IntTIntT17,18
-       | NullTNullT18,19
-       | UnitTUnitT19,20
-       | SecretT SecretT20,21
-       | NewTypeT NewTypeT21,22
-       | FuncT FuncT22,23
-       | TBOTTOMTBOTTOM23,24
-       | TypeVar TypeVar24,25
-data Prop Prop27,28
-data Prop = TypeOf TypeOf27,28
-          | Assignable Assignable28,29
-          | GammaConstr GammaConstr29,30
-type Premise Premise32,33
-type Conclusion Conclusion33,34
-data Infer Infer34,35
-data Infer      = Infer Infer34,35
-data Infer      = Infer { premise premise34,35
-data Infer      = Infer { premise ::Premise,  conclusion conclusion34,35
-type IR IR36,37
-addV addV38,39
-data SUB SUB44,45
-data SUB = SUB SUB44,45
-         | SUBBOTTOMSUBBOTTOM45,46
-type E E49,50
-type Ep Ep52,53
-type D0 D053,54
-type HObj HObj56,57
-type H H60,61
-type REF REF61,62
-type Eval Eval62,63
-type GT GT65,66
-type TypeEvalRes TypeEvalRes66,67
-type TypeEval TypeEval67,68
-type GlobalInfo GlobalInfo70,71
+data V V11,12
+data V = ValV ValV11,12
+data V = ValV {val val11,12
+       | RefV RefV12,13
+       | RefV {ref ref12,13
+       | SubV SubV13,14
+       | SubV {sub sub13,14
+       | SecretV SecretV14,15
+       | SecretV {secret secret14,15
+       | VBOTTOMVBOTTOM15,16
+data T T19,20
+data T = IntTIntT19,20
+       | NullTNullT20,21
+       | UnitTUnitT21,22
+       | SecretT SecretT22,23
+       | NewTypeT NewTypeT23,24
+       | FuncT FuncT24,25
+       | TBOTTOMTBOTTOM25,26
+data SUB SUB29,30
+data SUB = SUB SUB29,30
+         | SUBBOTTOMSUBBOTTOM30,31
+type E E34,35
+type Ep Ep37,38
+type D0 D038,39
+type DT DT39,40
+type HObj HObj42,43
+type H H46,47
+type REF REF47,48
+type Eval Eval48,49
+type GT GT51,52
+type GlobalInfo GlobalInfo54,55
 
-./src/EnvironmentUtils.hs,510
+./src/EnvironmentUtils.hs,816
 module EnvironmentUtils EnvironmentUtils0,1
-newE newE5,6
-singleE singleE8,9
-extendE extendE11,12
-newHObj newHObj14,15
-singleHObj singleHObj17,18
-extendHObj extendHObj20,21
-newH newH23,24
-singleH singleH26,27
-extendH extendH29,30
-updateHAt updateHAt34,35
-globalEnv globalEnv37,38
-newEp newEp40,41
-singleEp singleEp43,44
-extendEp extendEp46,47
-newD0 newD049,50
-singleD0 singleD052,53
-extendD0 extendD055,56
-newGlobalInfo newGlobalInfo58,59
-mapN mapN61,62
-mapT mapT65,66
+type Simple Simple7,8
+type Indirect Indirect8,9
+singleSimple singleSimple10,11
+singleIndirect singleIndirect13,14
+extendSimple extendSimple16,17
+extendIndirect extendIndirect19,20
+newE newE22,23
+singleE singleE25,26
+extendE extendE28,29
+newHObj newHObj31,32
+singleHObj singleHObj34,35
+extendHObj extendHObj37,38
+newH newH40,41
+singleH singleH43,44
+extendH extendH46,47
+updateHAt updateHAt49,50
+newEp newEp52,53
+singleEp singleEp55,56
+extendEp extendEp58,59
+newD0 newD061,62
+singleD0 singleD064,65
+extendD0 extendD067,68
+newDT newDT70,71
+extendDT extendDT73,74
+newGT newGT80,81
+singleGT singleGT83,84
+extendGT extendGT86,87
+isBound isBound89,90
+newGlobalInfo newGlobalInfo92,93
+mapN mapN95,96
+mapT mapT99,100
 
-./src/Programs.hs,728
+./src/Programs.hs,757
 module Programs Programs0,1
 numE numE4,5
 nameE nameE5,6
@@ -103,6 +103,7 @@ program14 program1499,100
 program14main program14main100,101
 program15 program15106,107
 program15main program15main107,108
+program16 program16114,115
 
 ./src/ATL.hs,1147
 module ATL ATL0,1
@@ -141,20 +142,29 @@ data Prog Prog39,40
 data Prog = DeclProg DeclProg39,40
           | StmtProg StmtProg40,41
 
-./src/Types.hs,176
+./src/Types.hs,492
 module Types Types0,1
-mappendTypes mappendTypes12,13
-infRules infRules18,19
-testEq testEq24,25
-maybeFail maybeFail29,30
-funcID funcID33,34
-typeEval typeEval36,37
+mappendTypes mappendTypes15,16
+data Inferrable Inferrable20,21
+data Inferrable = E E20,21
+                | S S21,22
+                | P P22,23
+data InferType InferType25,26
+data InferType = TypeOf TypeOf25,26
+               | Assignable Assignable26,27
+type Inference Inference29,30
+localState localState31,32
+typeUniverse typeUniverse40,41
+evalInfer evalInfer43,44
+runInferWith runInferWith46,47
+proveAND proveAND49,50
+infer infer57,58
 
 ./src/Lib.hs,42
 module LibLib0,1
 someFunc someFunc4,5
 
-./src/NaturalSemantics.hs,320
+./src/NaturalSemantics.hs,337
 module NaturalSemantics NaturalSemantics0,1
 valv valv14,15
 refv refv15,16
@@ -167,7 +177,8 @@ fresh fresh28,29
 runEvalHelper runEvalHelper31,32
 runEval runEval43,44
 evalGlobalInfo evalGlobalInfo46,47
-eval eval55,56
+addV addV57,58
+eval eval62,63
 
 ./test/Spec.hs,15
 main main0,1

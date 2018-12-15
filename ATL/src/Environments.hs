@@ -4,6 +4,8 @@ import Control.Monad.Reader
 import Control.Monad.State
 import Control.Monad.Except
 import Control.Monad.Identity
+import qualified Data.Map as M
+import Data.Map (Map)
 import ATL
 
 -- Possible Values
@@ -22,24 +24,7 @@ data T = IntT
        | NewTypeT Identifier
        | FuncT [T] T
        | TBOTTOM
-       | TypeVar Identifier
-       deriving (Eq, Show)
-
-data Prop = TypeOf Expr T
-          | Assignable Expr T
-          | GammaConstr Identifier T
-          deriving (Eq, Show)
-
-type Premise    = [Prop]
-type Conclusion = Prop
-data Infer      = Infer { premise ::Premise,  conclusion :: Conclusion }
-                deriving (Eq, Show)
-type IR         = Either Stmt Expr -> [Infer]
-
-addV :: V -> V -> V
-addV (ValV (Number n1)) (ValV (Number n2)) = ValV (Number (n1 + n2))
-addV (SecretV v1) v2 = SecretV (addV v1 v2)
-addV v1 (SecretV v2) = SecretV (addV v1 v2)
+       deriving (Eq, Show, Ord)
 
 -- Subprocess
 data SUB = SUB Stmt [Identifier]
@@ -52,6 +37,7 @@ type E         = Identifier -> V
 -- Subprocess Environment
 type Ep        = Identifier -> SUB
 type D0        = Identifier -> Identifier -> V
+type DT        = Map T (Identifier -> T)
 
 -- HeapObject Enivronment
 type HObj      = Identifier -> V
@@ -64,8 +50,6 @@ type Eval      = (H, E, Either Stmt Expr) -> ExceptT String (ReaderT GlobalInfo 
 
 -- Gamma Type Environment
 type GT          = Identifier -> T
-type TypeEvalRes = ExceptT String (ReaderT (IR, GlobalInfo) (StateT GT Identity)) T
-type TypeEval    = Either Stmt Expr -> TypeEvalRes
 
 -- Global Information for types and Functions
-type GlobalInfo = (D0, Ep)
+type GlobalInfo = (D0, DT, Ep)

@@ -20,7 +20,7 @@ procEnvtoEnv :: Ep -> E
 procEnvtoEnv ep id = SubV (ep id)
 
 eProc :: GlobalInfo -> Ep
-eProc (_, ep) = ep
+eProc (_,_, ep) = ep
 
 isNum :: V -> Bool
 isNum (ValV (Number _)) = True
@@ -45,13 +45,20 @@ runEval :: Prog -> IO (Either String V)
 runEval = runEvalHelper newGlobalInfo
 
 evalGlobalInfo :: Decl -> GlobalInfo -> GlobalInfo
-evalGlobalInfo (ProcDecl id tb s) (d0, ep) = (d0, ep')
+evalGlobalInfo (ProcDecl id tb s) (d0, dt, ep) = (d0, dt, ep')
     where
         ep' = extendEp ep (singleEp id (SUB s (fst <$> tb)))
         
-evalGlobalInfo (NewTypeDecl id tb) (d0, ep) = (extendD0 d0 d0', ep)
+evalGlobalInfo (NewTypeDecl id tb) (d0, dt, ep) = (extendD0 d0 d0', dt', ep)
     where
         d0' = List.foldl' (\dacc (idi, tyi) -> extendD0 dacc (singleD0 id (singleE idi (mapN tyi)))) newD0 tb
+        -- TypeVar
+        dt' = List.foldl' (\dacc (idi, tyi) -> extendDT dacc (NewTypeT id) idi (mapT tyi)) newDT tb
+
+addV :: V -> V -> V
+addV (ValV (Number n1)) (ValV (Number n2)) = ValV (Number (n1 + n2))
+addV (SecretV v1) v2 = SecretV (addV v1 v2)
+addV v1 (SecretV v2) = SecretV (addV v1 v2)
 
 eval :: Eval
 
@@ -71,7 +78,7 @@ eval (h, env, Right (AddExpr e1 e2)) = do
 eval (h0, env, Right (CallExpr id args)) = do
   let SubV (SUB s fargs) = env id
   (hk, eLoc) <- foldM evalArg (h0, newE) (zip fargs args)
-  (_, ep) <- ask
+  (_, _, ep) <- ask
   eval (hk, extendE (procEnvtoEnv ep) eLoc, Left s)
   where
     evalArg (hi, eLoc) (farg, ei) = do
@@ -89,7 +96,7 @@ eval (h, env, Right (PrintExpr e)) = do
 
 -- (new)
 eval (h, env, Right (NewExpr id)) = do
-  (d0, _) <- ask
+  (d0, _, _) <- ask
   index   <- get
   let ref = fresh index
   pure (extendH h (singleH ref (d0 id)), refv ref)

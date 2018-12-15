@@ -111,3 +111,9 @@ program15main = StmtProg $ mkSeq [
   ,AssignStmt (ID "y") (NameExpr (DeRef (ID "x") "age"))
   ,ReturnStmt (PrintExpr (nameE "y"))
                                  ]
+
+program16 = StmtProg $ mkSeq [
+     AssignStmt (ID "x") (numE 5)
+    ,AssignStmt (ID "y") (numE 5)
+    ,AssignStmt (ID "z") (AddExpr (NameExpr (ID "x")) (NameExpr (ID "y")))
+                             ]
