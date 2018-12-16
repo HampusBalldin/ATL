@@ -104,6 +104,12 @@ program14main = StmtProg $ mkSeq [
   ,ReturnStmt (NameExpr (DeRef (ID "x") "age"))
                                  ]
 
+program142 = DeclProg (NewTypeDecl "Person" [("age", IntType)]) program142main
+program142main = StmtProg $ mkSeq [
+   AssignStmt (ID "x") (NewExpr "Person")
+  ,ReturnStmt (numE 0)
+                                 ]
+
 program15 = DeclProg (NewTypeDecl "Person" [("age", IntType)]) program15main
 program15main = StmtProg $ mkSeq [
    AssignStmt (ID "x") (NewExpr "Person")

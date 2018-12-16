@@ -82,7 +82,7 @@ d0 d023,24
 dt dt26,27
 ep ep29,30
 
-./src/Programs.hs,757
+./src/Programs.hs,827
 module Programs Programs0,1
 numE numE4,5
 nameE nameE5,6
@@ -109,9 +109,11 @@ program13 program1393,94
 program13main program13main94,95
 program14 program1499,100
 program14main program14main100,101
-program15 program15106,107
-program15main program15main107,108
-program16 program16114,115
+program142 program142106,107
+program142main program142main107,108
+program15 program15112,113
+program15main program15main113,114
+program16 program16120,121
 
 ./src/ATL.hs,1147
 module ATL ATL0,1
@@ -150,25 +152,29 @@ data Prog Prog39,40
 data Prog = DeclProg DeclProg39,40
           | StmtProg StmtProg40,41
 
-./src/Types.hs,543
+./src/Types.hs,671
 module Types Types0,1
-mappendTypes mappendTypes16,17
-printLine printLine21,22
-data Inferrable Inferrable23,24
-data Inferrable = E E23,24
-                | S S24,25
-                | P P25,26
-data InferType InferType28,29
-data InferType = TypeOf TypeOf28,29
-               | Assignable Assignable29,30
-type InferenceRes InferenceRes32,33
-type Inference Inference33,34
-typeCheck typeCheck35,36
-localState localState41,42
-typeUniverse typeUniverse44,45
-when2 when247,48
-proveAND proveAND50,51
-infer infer58,59
+mappendTypes mappendTypes18,19
+printLine printLine23,24
+data Inferrable Inferrable25,26
+data Inferrable = E E25,26
+                | S S26,27
+                | P P27,28
+data InferType InferType30,31
+data InferType = TypeOf TypeOf30,31
+               | Assignable Assignable31,32
+type InferenceRes InferenceRes34,35
+type Inference Inference35,36
+typeCheck typeCheck37,38
+localState localState46,47
+typeUniverse typeUniverse49,50
+when2 when252,53
+resetFail resetFail55,56
+chainResetFail chainResetFail58,59
+chainResetFailOR chainResetFailOR61,62
+proveAND proveAND66,67
+proveOR proveOR74,75
+infer infer82,83
 
 ./src/Lib.hs,42
 module LibLib0,1
