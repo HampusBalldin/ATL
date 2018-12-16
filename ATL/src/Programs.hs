@@ -50,6 +50,12 @@ program6 = StmtProg $ mkSeq [
   ,ReturnStmt $ AddExpr (nameE "x") (nameE "y")
            ]
 
+program6BAD = StmtProg $ mkSeq [
+   AssignStmt (ID "x") (numE 1)
+  ,AssignStmt (ID "x") (ValExpr NULL)
+  ,ret42
+           ]
+
 program7 = StmtProg $ mkSeq [
    AssignStmt (ID "x") (numE (-10)) 
   ,WhileStmt (nameE "x") $ mkSeq [

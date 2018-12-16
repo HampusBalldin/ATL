@@ -32,20 +32,20 @@ data InferType = TypeOf Inferrable T
                | Assignable Inferrable T
                deriving (Eq, Show)
 
-type InferenceRes = ReaderT GlobalInfo (StateT GT IO) Bool
+type InferenceRes = Reader GlobalInfo [[State GT Bool]]
 type Inference = InferType -> InferenceRes
 
-typeCheck :: Prog -> IO Bool
-typeCheck p = evalStateT (runReaderT inf gi) newGT
-    where
-      gi  = globalInfo p
-      inf = infer (TypeOf (P p) IntT)
+-- typeCheck :: Prog -> IO Bool
+-- typeCheck p = evalStateT (runReaderT inf gi) newGT
+--     where
+--       gi  = globalInfo p
+--       inf = infer (TypeOf (P p) IntT)
 
 ---------------------------------
 -- Helper Functions
 ---------------------------------
-localState :: (GT -> GT) -> InferenceRes -> InferenceRes
-localState f st = get >>= \s -> put (f s) >> st >>= \a -> put s >> pure a
+-- localState :: (GT -> GT) -> InferenceRes -> InferenceRes
+-- localState f st = get >>= \s -> put (f s) >> st >>= \a -> put s >> pure a
 
 typeUniverse :: GlobalInfo -> [T]
 typeUniverse gi = [NullT, IntT] ++ (M.keys (dt gi)) 
@@ -53,68 +53,127 @@ typeUniverse gi = [NullT, IntT] ++ (M.keys (dt gi))
 when2 :: Monad m => Bool -> a -> m a -> m a
 when2 c d ma = if c then ma else pure d
 
-resetFail :: GT -> InferenceRes -> InferenceRes -> InferenceRes
-resetFail gt inf cont = inf >>= \r -> if r then cont else put gt >> pure False
+-- resetFail :: GT -> InferenceRes -> InferenceRes -> InferenceRes
+-- resetFail gt inf cont = inf >>= \r -> if r then cont else put gt >> pure False
 
-chainResetFail :: GT -> [InferenceRes] -> InferenceRes
-chainResetFail gt irs = foldM (\r ir -> when2 r r $ ir) True irs >>= \r -> when2 (not r) r (put gt >> pure r)
+-- chainResetFail :: GT -> [InferenceRes] -> InferenceRes
+-- chainResetFail gt irs = foldM (\r ir -> when2 r r $ ir) True irs >>= \r -> when2 (not r) r (put gt >> pure r)
 
-chainResetFailOR :: GT -> [[InferenceRes]] -> InferenceRes
-chainResetFailOR gt infs = foldM single False infs
-    where
-      single r inf = when2 (not r) r (chainResetFail gt inf)
+-- chainResetFailOR :: GT -> [[InferenceRes]] -> InferenceRes
+-- chainResetFailOR gt infs = foldM single False infs
+--     where
+--       single r inf = when2 (not r) r (chainResetFail gt inf)
+
+testAND :: [[[a]]] -> [[a]]
+testAND []      = [[]]
+testAND (inf:infs) = pure (++) <*> inf <*> testAND infs
 
 proveAND :: [InferType] -> InferenceRes
-proveAND infs = do
-  gt <- get 
-  r <- foldM single True infs
-  if r then pure r else const False <$> put gt
-  where
-    single r it = if r then infer it else pure r
+proveAND []      = pure [[]]
+proveAND (inf:infs) = do
+  gi <- ask
+  statesi1 <- infer inf
+  pure $ pure (++) <*> statesi1 <*> (runReader (proveAND infs) gi)
+  
+  -- (++) <$> infer inf <*> proveAND infs
+testOR :: [[[[a]]]] -> [[a]]
+testOR infs = join (testAND <$> infs)
 
 proveOR :: [[InferType]] -> InferenceRes
-proveOR infs = foldM single False infs
-    where
-      single r inf = when2 (not r) r (proveAND inf)
+proveOR infs = do
+  gi <- ask
+  pure . join $ flip runReader gi . proveAND <$> infs
+
+typeCheck :: Prog -> [Bool]
+typeCheck p = solve states
+  where
+    states = runIdentity $ runReaderT (infer (TypeOf (P p) IntT)) gi
+    gi = globalInfo p
+
+
+testType :: InferType -> [Bool]
+testType inf = solve (runReader (infer inf) newGlobalInfo)
+
+chainAND :: [State GT Bool] -> State GT Bool
+chainAND []      = pure True
+chainAND (s:sts) = do
+    gt <- get
+    let (b, gt') = runState s gt
+    when2 b b $ do
+        put gt'
+        b' <- chainAND sts
+        pure (b && b')
+
+chainOR :: [State GT Bool] -> State GT Bool
+chainOR []      = pure False
+chainOR (s:sts) = do
+    gt <- get
+    let (b, gt') = runState s gt
+    when2 (not b) b $ do
+        put gt'
+        b' <- chainOR sts
+        pure (b || b')
+
+solve :: [[State GT Bool]] -> [Bool]
+solve states = do
+  andBlock <- states
+  [runIdentity $ evalStateT (chainAND andBlock) newGT]
+
+true, false :: InferenceRes
+pure3 = pure.pure.pure
+pure4 = pure.pure.pure.pure
+true  = pure4 True
+false = pure4 False
+
+-- stateInfer :: (GlobalInfo -> GT -> InferenceRes) -> InferenceRes
+-- stateInfer f = do
+--   gi <- ask
+--   let ir = pure $ pure $ 
+  
+--   false
+  -- pure $ pure $ pure $ do
+  --   gt <- get
+  --   chainOR (chainAND <$> (runReader (f gt gi) gi))
 
 ---------------------------------
 -- Inference Alg.
 ---------------------------------
 infer :: Inference
 -- (t-num)
-infer (TypeOf (E (ValExpr (Number n))) IntT) = pure True
+infer (TypeOf (E (ValExpr (Number n))) IntT) = true
 
 -- (t-null)
--- infer (TypeOf (E (ValExpr NULL)) NullT) = pure True
+infer (TypeOf (E (ValExpr NULL)) NullT) = true
 
 -- -- (t-id)
--- infer (TypeOf (E (NameExpr (ID id))) t) = do
---   gt <- get
---   case gt id of
---     TBOTTOM -> const True <$> put (extendGT gt (singleGT id t))
---     t'      -> pure (t == t')
+infer (TypeOf (E (NameExpr (ID id))) t) = pure3 idstate
+ where
+   idstate = do
+     gt <- get
+     case gt id of
+       TBOTTOM -> const True <$> put (extendGT gt (singleGT id t))
+       t'      -> pure (t == t')
 
 -- -- (t-call)
--- infer (TypeOf (E (CallExpr id args)) t0) = do
---   gt <- get
---   case gt id of
---     FuncT targs rt -> if rt == t0 then do
---       proveAND $ [TypeOf (E a) t | (a, t) <- zip args targs] else pure False
-      
---     _              -> pure False
+-- infer (TypeOf (E (CallExpr id args)) t0) = stateInfer callstate
+--     where
+--         callstate gi = do
+--             gt <- get
+--             case gt id of
+--                 FuncT targs rt -> if rt == t0 then do
+--                     (proveAND [TypeOf (E a) t | (a, t) <- zip args targs]) else false
+--                 _              -> false
 
 -- -- (t-plus)
--- infer (TypeOf (E (AddExpr e1 e2)) IntT) = proveAND [TypeOf (E e1) IntT, TypeOf (E e2) IntT]
+infer (TypeOf (E (AddExpr e1 e2)) IntT) = proveAND [TypeOf (E e1) IntT, TypeOf (E e2) IntT]
 
 -- -- (t-print)
--- infer (TypeOf (E (PrintExpr e)) IntT) = infer (TypeOf (E e) IntT)
+infer (TypeOf (E (PrintExpr e)) IntT) = infer (TypeOf (E e) IntT)
 
 -- -- (t-new)
--- infer (TypeOf exp@(E (NewExpr id)) nt@(NewTypeT id')) = do
---   gi <- ask
---   r <- pure (id == id' && M.member nt (dt gi))
---   printLine $ "New: " ++ show exp ++ " <- " ++ show nt ++ ": " ++ show r
---   pure r
+infer (TypeOf exp@(E (NewExpr id)) nt@(NewTypeT id')) = do
+  gi <- ask
+  pure [[(pure $ id == id' && M.member nt (dt gi))]]
 
 -- -- (t-load)
 -- infer (TypeOf (E (NameExpr (DeRef e id))) t) = do
@@ -136,31 +195,32 @@ infer (TypeOf (E (ValExpr (Number n))) IntT) = pure True
 --                  trace (id ++ " <- " ++ show t) [TypeOf (E (NameExpr e)) tid, Assignable (E lhs) t]
 
 -- -- (t-assign)
--- infer (TypeOf (S (AssignStmt (ID id) e)) UnitT) = do
---     gi <- ask
---     printLine $ "Assign with universe: " ++ show (typeUniverse gi)
---     proveOR [[TypeOf (E $ NameExpr $ ID id) t, Assignable (E e) t] | t <- typeUniverse gi]
+infer (TypeOf (S (AssignStmt (ID id) e)) UnitT) = do
+    gi <- ask
+    pure $ join $ [runReader (ands t) gi | t <- typeUniverse gi]
+    where
+        ands t = proveAND [TypeOf (E $ NameExpr $ ID id) t, Assignable (E e) t]
       
 -- -- (t-block)
--- infer (TypeOf (S (BlockStmt s)) t) = infer (TypeOf (S s) t)
+infer (TypeOf (S (BlockStmt s)) t) = infer (TypeOf (S s) t)
 
 -- -- (t-seq)
--- infer (TypeOf (S (SeqStmt s1 s2)) t) = proveAND [TypeOf (S s1) UnitT, TypeOf (S s2) t]
+infer (TypeOf (S (SeqStmt s1 s2)) t) = proveAND [TypeOf (S s1) UnitT, TypeOf (S s2) t]
 
 -- -- (t-skip)
--- infer (TypeOf (S (SkipStmt)) UnitT) = pure True
+infer (TypeOf (S (SkipStmt)) UnitT) = true
 
 -- -- (t-if)
--- infer (TypeOf (S (IfThenElseStmt e s1 s2)) t) = proveAND [TypeOf (E e) t, TypeOf (S s1) t, TypeOf (S s2) t]
+infer (TypeOf (S (IfThenElseStmt e s1 s2)) t) = proveAND [TypeOf (E e) t, TypeOf (S s1) t, TypeOf (S s2) t]
 
 -- -- (t-while)
--- infer (TypeOf (S (WhileStmt e s)) UnitT) = proveAND [TypeOf (E e) IntT, TypeOf (S s) UnitT]
+infer (TypeOf (S (WhileStmt e s)) UnitT) = proveAND [TypeOf (E e) IntT, TypeOf (S s) UnitT]
 
 -- -- (t-return)
--- infer (TypeOf (S (ReturnStmt e)) t) = infer (TypeOf (E e) t)
+infer (TypeOf (S (ReturnStmt e)) t) = infer (TypeOf (E e) t)
 
 -- -- (t-stmtprog)
--- infer (TypeOf (P (StmtProg s)) t) = infer (TypeOf (S s) t)
+infer (TypeOf (P (StmtProg s)) t) = infer (TypeOf (S s) t)
 
 -- -- (t-proc)
 -- infer (TypeOf (P (DeclProg (ProcDecl id tb s) p)) t) = do
@@ -173,25 +233,18 @@ infer (TypeOf (E (ValExpr (Number n))) IntT) = pure True
 --              ,infer (TypeOf (P p) t)]
              
 -- -- (t-dataty)
--- infer (TypeOf (P (DeclProg (NewTypeDecl _ _) p)) t) = infer (TypeOf (P p) t)
+infer (TypeOf (P (DeclProg (NewTypeDecl _ _) p)) t) = infer (TypeOf (P p) t)
 
 -- -- (assignable-bottom)
--- infer exp@(Assignable _ TBOTTOM) = pure False
+infer exp@(Assignable _ TBOTTOM) = false
 
 -- -- (assignable-null)
--- infer exp@(Assignable (E e) NullT) = do
---   gi <- ask
---   r <- proveOR (M.keys (dt gi) >>= \tid -> [[TypeOf (E e) tid]])
---   printLine $ "Assignable: " ++ show exp ++ " <- NullT: " ++ show r
---   pure r
+infer exp@(Assignable (E e) NullT) = do
+  gi <- ask
+  proveOR (M.keys (dt gi) >>= \tid -> [[TypeOf (E e) tid]])
 
 -- -- (assignable-ty)
--- infer (Assignable exp@(E e) t) = do
---   r <- infer (TypeOf (E e) t)
---   printLine $ "Assignable: " ++ show exp ++ " <- " ++ show t ++ ": " ++ show r
---   pure r
+infer (Assignable exp@(E e) t) = infer (TypeOf (E e) t)
 
 -- (t-fail)
-infer i = do
-  printLine $ "No Match: " ++ show i
-  pure False
+infer _ = false 

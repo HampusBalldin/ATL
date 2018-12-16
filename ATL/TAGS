@@ -82,7 +82,7 @@ d0 d023,24
 dt dt26,27
 ep ep29,30
 
-./src/Programs.hs,827
+./src/Programs.hs,862
 module Programs Programs0,1
 numE numE4,5
 nameE nameE5,6
@@ -98,22 +98,23 @@ program3 program337,38
 program4 program438,39
 program5 program542,43
 program6 program646,47
-program7 program752,53
-program8 program861,62
-program9 program965,66
-program10 program1071,72
-program11 program1178,79
-program12 program1285,86
-program12main program12main88,89
-program13 program1393,94
-program13main program13main94,95
-program14 program1499,100
-program14main program14main100,101
-program142 program142106,107
-program142main program142main107,108
-program15 program15112,113
-program15main program15main113,114
-program16 program16120,121
+program6BAD program6BAD52,53
+program7 program758,59
+program8 program867,68
+program9 program971,72
+program10 program1077,78
+program11 program1184,85
+program12 program1291,92
+program12main program12main94,95
+program13 program1399,100
+program13main program13main100,101
+program14 program14105,106
+program14main program14main106,107
+program142 program142112,113
+program142main program142main113,114
+program15 program15118,119
+program15main program15main119,120
+program16 program16126,127
 
 ./src/ATL.hs,1147
 module ATL ATL0,1
@@ -152,7 +153,7 @@ data Prog Prog39,40
 data Prog = DeclProg DeclProg39,40
           | StmtProg StmtProg40,41
 
-./src/Types.hs,671
+./src/Types.hs,807
 module Types Types0,1
 mappendTypes mappendTypes18,19
 printLine printLine23,24
@@ -165,16 +166,24 @@ data InferType = TypeOf TypeOf30,31
                | Assignable Assignable31,32
 type InferenceRes InferenceRes34,35
 type Inference Inference35,36
-typeCheck typeCheck37,38
-localState localState46,47
 typeUniverse typeUniverse49,50
 when2 when252,53
-resetFail resetFail55,56
-chainResetFail chainResetFail58,59
-chainResetFailOR chainResetFailOR61,62
-proveAND proveAND66,67
-proveOR proveOR74,75
-infer infer82,83
+testAND testAND66,67
+proveAND proveAND70,71
+testOR testOR78,79
+proveOR proveOR81,82
+typeCheck typeCheck86,87
+testType testType93,94
+chainAND chainAND96,97
+chainOR chainOR106,107
+solve solve116,117
+true, false false121,122
+true,true121,122
+pure3 pure3122,123
+pure4 pure4123,124
+true true124,125
+false false125,126
+infer infer140,141
 
 ./src/Lib.hs,42
 module LibLib0,1
