@@ -82,7 +82,7 @@ d0 d023,24
 dt dt26,27
 ep ep29,30
 
-./src/Programs.hs,862
+./src/Programs.hs,1022
 module Programs Programs0,1
 numE numE4,5
 nameE nameE5,6
@@ -106,15 +106,19 @@ program10 program1077,78
 program11 program1184,85
 program12 program1291,92
 program12main program12main94,95
-program13 program1399,100
-program13main program13main100,101
-program14 program14105,106
-program14main program14main106,107
-program142 program142112,113
-program142main program142main113,114
-program15 program15118,119
-program15main program15main119,120
-program16 program16126,127
+program12BAD program12BAD99,100
+program12BADmain program12BADmain102,103
+program12BAD2 program12BAD2107,108
+program12BADmain2 program12BADmain2110,111
+program13 program13115,116
+program13main program13main116,117
+program14 program14121,122
+program14main program14main122,123
+program142 program142128,129
+program142main program142main129,130
+program15 program15134,135
+program15main program15main135,136
+program16 program16142,143
 
 ./src/ATL.hs,1147
 module ATL ATL0,1
@@ -153,37 +157,39 @@ data Prog Prog39,40
 data Prog = DeclProg DeclProg39,40
           | StmtProg StmtProg40,41
 
-./src/Types.hs,807
+./src/Types.hs,943
 module Types Types0,1
-mappendTypes mappendTypes18,19
-printLine printLine23,24
-data Inferrable Inferrable25,26
-data Inferrable = E E25,26
-                | S S26,27
-                | P P27,28
-data InferType InferType30,31
-data InferType = TypeOf TypeOf30,31
-               | Assignable Assignable31,32
-type InferenceRes InferenceRes34,35
-type Inference Inference35,36
-typeUniverse typeUniverse49,50
-when2 when252,53
-testAND testAND66,67
-proveAND proveAND70,71
-testOR testOR78,79
-proveOR proveOR81,82
-typeCheck typeCheck86,87
-testType testType93,94
-chainAND chainAND96,97
-chainOR chainOR106,107
-solve solve116,117
-true, false false121,122
-true,true121,122
-pure3 pure3122,123
-pure4 pure4123,124
-true true124,125
-false false125,126
-infer infer140,141
+mappendTypes mappendTypes23,24
+printLine printLine28,29
+data Inferrable Inferrable30,31
+data Inferrable = E E30,31
+                | S S31,32
+                | P P32,33
+data InferType InferType35,36
+data InferType = TypeOf TypeOf35,36
+               | Assignable Assignable36,37
+               | LocalStateIT LocalStateIT37,38
+data Inf Inf39,40
+data Inf = Leaf Leaf39,40
+         | And And40,41
+         | Or Or41,42
+         | LocalState LocalState42,43
+type InferenceRes InferenceRes44,45
+type Inference Inference45,46
+localState localState50,51
+typeUniverse typeUniverse55,56
+when2 when258,59
+proveAND proveAND61,62
+proveOR proveOR64,65
+allPaths allPaths69,70
+typeCheck typeCheck80,81
+findSol findSol86,87
+chainAND chainAND91,92
+true, false false101,102
+true,true101,102
+false false103,104
+allTypeAssignments allTypeAssignments105,106
+infer infer115,116
 
 ./src/Lib.hs,42
 module LibLib0,1

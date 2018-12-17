@@ -97,6 +97,22 @@ program12main = StmtProg $ mkSeq [
   ,ReturnStmt $ PrintExpr (nameE "r")
     ]
 
+program12BAD = DeclProg (ProcDecl "func" [("x", IntType), ("y", IntType)] (mkSeq [
+  ReturnStmt $ AddExpr (nameE "x") (nameE "y")
+               ])) program12BADmain
+program12BADmain = StmtProg $ mkSeq [
+  AssignStmt (ID "r") (CallExpr "func" [numE 2, ValExpr NULL])
+  ,ReturnStmt $ PrintExpr (nameE "r")
+    ]
+
+program12BAD2 = DeclProg (ProcDecl "func" [("x", IdType "undef"), ("y", IntType)] (mkSeq [
+  ReturnStmt $ AddExpr (nameE "x") (nameE "y")
+               ])) program12BADmain2
+program12BADmain2 = StmtProg $ mkSeq [
+  AssignStmt (ID "r") (CallExpr "func" [numE 2, numE 2])
+  ,ReturnStmt $ PrintExpr (nameE "r")
+    ]
+
 program13 = DeclProg (NewTypeDecl "Person" [("age", IntType)]) program13main
 program13main = StmtProg $ mkSeq [
    AssignStmt (ID "x") (NewExpr "Person")
@@ -128,4 +144,5 @@ program16 = StmtProg $ mkSeq [
      AssignStmt (ID "x") (numE 5)
     ,AssignStmt (ID "y") (numE 5)
     ,AssignStmt (ID "z") (AddExpr (NameExpr (ID "x")) (NameExpr (ID "y")))
+    ,ReturnStmt (NameExpr (ID "z"))
                              ]
